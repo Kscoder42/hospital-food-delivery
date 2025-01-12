@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // or "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// Define your models here
+model Patient {
+  id                Int      @id @default(autoincrement())
+  name              String
+  diseases          String
+  allergies         String
+  roomNumber        String
+  bedNumber         String
+  floorNumber       String
+  age               Int
+  gender            String
+  contactInfo       String
+  emergencyContact  String
+  others            String?
+  dietCharts        DietChart[]
+  deliveries        Delivery[]
+}
+
+model DietChart {
+  id          Int      @id @default(autoincrement())
+  patientId   Int
+  patient     Patient  @relation(fields: [patientId], references: [id])
+  mealTime    String
+  ingredients String
+  instructions String
+}
+
+model PantryStaff {
+  id          Int      @id @default(autoincrement())
+  name        String
+  contactInfo String
+  location    String
+  deliveries  Delivery[]
+}
+
+model DeliveryPersonnel {
+  id          Int      @id @default(autoincrement())
+  name        String
+  contactInfo String
+  otherDetails String?
+  deliveries  Delivery[]
+}
+
+model Delivery {
+  id          Int      @id @default(autoincrement())
+  mealTime    String
+  patientId   Int
+  patient     Patient  @relation(fields: [patientId], references: [id])
+  pantryStaffId Int
+  pantryStaff PantryStaff @relation(fields: [pantryStaffId], references: [id])
+  deliveryPersonnelId Int
+  deliveryPersonnel DeliveryPersonnel @relation(fields: [deliveryPersonnelId], references: [id])
+  status      String
+  timestamp   DateTime @default(now())
+  notes       String?
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  email       String   @unique
+  password    String
+  role        String
+}
